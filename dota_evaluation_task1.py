@@ -38,7 +38,7 @@ def parse_gt(filename):
                 if (len(splitlines) == 9):
                     object_struct['difficult'] = 0
                 elif (len(splitlines) == 10):
-                    object_struct['difficult'] = int(splitlines[9])
+                    object_struct['difficult'] = int(float(splitlines[9]))
                 object_struct['bbox'] = [float(splitlines[0]),
                                          float(splitlines[1]),
                                          float(splitlines[2]),
@@ -108,8 +108,8 @@ def voc_eval(detpath,
     cachedir: Directory for caching the annotations
     [ovthresh]: Overlap threshold (default = 0.5)
     [use_07_metric]: Whether to use VOC07's 11 point AP computation
-        (default False)
-    """
+        (default False)"""
+    
     # assumes detections are in detpath.format(classname)
     # assumes annotations are in annopath.format(imagename)
     # assumes imagesetfile is a text file with each line an image name
@@ -161,35 +161,50 @@ def voc_eval(detpath,
         lines = f.readlines()
 
     splitlines = [x.strip().split(' ') for x in lines]
+    print(splitlines)
     image_ids = [x[0] for x in splitlines]
     confidence = np.array([float(x[1]) for x in splitlines])
-
+    print(confidence)
     #print('check confidence: ', confidence)
 
     BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
-
+    print(BB[0])
     # sort by confidence
     sorted_ind = np.argsort(-confidence)
+    print(sorted_ind)
     sorted_scores = np.sort(-confidence)
-
+    print(sorted_scores)
     #print('check sorted_scores: ', sorted_scores)
     #print('check sorted_ind: ', sorted_ind)
 
     ## note the usage only in numpy not for list
     BB = BB[sorted_ind, :]
+    print(BB[0])
     image_ids = [image_ids[x] for x in sorted_ind]
     #print('check imge_ids: ', image_ids)
     #print('imge_ids len:', len(image_ids))
     # go down dets and mark TPs and FPs
+    print(image_ids)
     nd = len(image_ids)
     tp = np.zeros(nd)
     fp = np.zeros(nd)
+    i = 0 
     for d in range(nd):
         R = class_recs[image_ids[d]]
+        
+        i = i+1
         bb = BB[d, :].astype(float)
         ovmax = -np.inf
         BBGT = R['bbox'].astype(float)
-
+        if i<10:
+          print(image_ids[d])
+          print("BBGT")
+          print(BBGT)
+          print("BB")
+          print(bb)
+        #print(bb)
+        #print(BBGT)
+        #print(']]]]]]]]]]]s')
         ## compute det bb with each BBGT
 
         if BBGT.size > 0:
@@ -221,6 +236,8 @@ def voc_eval(detpath,
                    (BBGT_ymax - BBGT_ymin + 1.) - inters)
 
             overlaps = inters / uni
+            if i<10:
+              print("overlaps: {}".format(overlaps))
 
             BBGT_keep_mask = overlaps > 0
             BBGT_keep = BBGT[BBGT_keep_mask, :]
@@ -278,16 +295,18 @@ def main():
     # classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
     #             'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
 
-    detpath = r'PATH_TO_BE_CONFIGURED/Task1_{:s}.txt'
-    annopath = r'PATH_TO_BE_CONFIGURED/{:s}.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    imagesetfile = r'PATH_TO_BE_CONFIGURED/valset.txt'
+    annopath = r'/content/drive/MyDrive/HRSC2016/test_cut/labelTxt/{:s}.txt'
+    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
 
     # For DOTA-v1.5
     # classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
     #             'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter', 'container-crane']
     # For DOTA-v1.0
-    classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
+    '''classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
                 'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
+    '''
+    classnames = ['ship']
     classaps = []
     map = 0
     for classname in classnames:
@@ -296,7 +315,7 @@ def main():
              annopath,
              imagesetfile,
              classname,
-             ovthresh=0.5,
+             ovthresh=0.75,
              use_07_metric=True)
         map = map + ap
         #print('rec: ', rec, 'prec: ', prec, 'ap: ', ap)
