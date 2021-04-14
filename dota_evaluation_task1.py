@@ -236,12 +236,14 @@ def voc_eval(detpath,
                    (BBGT_ymax - BBGT_ymin + 1.) - inters)
 
             overlaps = inters / uni
-            if i<10:
+            if i<50:
               print("overlaps: {}".format(overlaps))
 
             BBGT_keep_mask = overlaps > 0
             BBGT_keep = BBGT[BBGT_keep_mask, :]
+            print("bbgt_keep: {}".format(BBGT_keep))
             BBGT_keep_index = np.where(overlaps > 0)[0]
+            print("BBGT_keep_index: {}".format(BBGT_keep_index))
             # pdb.set_trace()
             def calcoverlaps(BBGT_keep, bb):
                 overlaps = []
@@ -252,17 +254,23 @@ def voc_eval(detpath,
                 return overlaps
             if len(BBGT_keep) > 0:
                 overlaps = calcoverlaps(BBGT_keep, bb)
+                print('OVERLAPS: {}'.format(overlaps))
 
                 ovmax = np.max(overlaps)
+                print('ovmax: {}'.format(ovmax))
                 jmax = np.argmax(overlaps)
+                print('jmax1: {}'.format(jmax))
                 # pdb.set_trace()
                 jmax = BBGT_keep_index[jmax]
+                print('jmax2: {}'.format(jmax))
+
+                print('ovthresh: {}'.format(ovthresh))
 
         if ovmax > ovthresh:
             if not R['difficult'][jmax]:
                 if not R['det'][jmax]:
                     tp[d] = 1.
-                    R['det'][jmax] = 1
+                    #R['det'][jmax] = 1
                 else:
                     fp[d] = 1.
         else:
@@ -296,8 +304,10 @@ def main():
     #             'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
 
     annopath = r'/content/drive/MyDrive/HRSC2016/test_cut/labelTxt/{:s}.txt'
-    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
+    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_test1.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
+    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test.txt'
 
     # For DOTA-v1.5
     # classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
