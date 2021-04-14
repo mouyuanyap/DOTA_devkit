@@ -304,10 +304,10 @@ def main():
     #             'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
 
     annopath = r'/content/drive/MyDrive/HRSC2016/test_cut/labelTxt/{:s}.txt'
-    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_test1.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
-    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test.txt'
+    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result2.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_test1.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
+    #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test.txt'
 
     # For DOTA-v1.5
     # classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
