@@ -149,7 +149,7 @@ def voc_eval(detpath,
         R = [obj for obj in recs[imagename] if obj['name'] == classname]
         bbox = np.array([x['bbox'] for x in R])
         difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
-        det = [False] * len(R)
+        det = [0] * len(R)
         npos = npos + sum(~difficult)
         class_recs[imagename] = {'bbox': bbox,
                                  'difficult': difficult,
@@ -188,7 +188,8 @@ def voc_eval(detpath,
     nd = len(image_ids)
     tp = np.zeros(nd)
     fp = np.zeros(nd)
-    i = 0 
+    i = 0
+    aaa = [] 
     for d in range(nd):
         R = class_recs[image_ids[d]]
         
@@ -268,15 +269,22 @@ def voc_eval(detpath,
 
         if ovmax > ovthresh:
             if not R['difficult'][jmax]:
-                if not R['det'][jmax]:
+                if R['det'][jmax] == 0:
                     tp[d] = 1.
-                    #R['det'][jmax] = 1
+                    R['det'][jmax] = 1
+                #elif R['det'][jmax] == -1:
+                #    aaa.append(d)    
                 else:
-                    fp[d] = 1.
+                    fp[d] = 0.
+                    tp[d] = 0.
         else:
             fp[d] = 1.
 
     # compute precision recall
+
+    #tp = np.delete(tp,aaa)
+    #fp = np.delete(fp,aaa)
+
 
     print('check fp:', fp)
     print('check tp', tp)
@@ -285,6 +293,8 @@ def voc_eval(detpath,
     print('npos num:', npos)
     fp = np.cumsum(fp)
     tp = np.cumsum(tp)
+    print('tp:', tp)
+    print('fp:', fp)
 
     rec = tp / float(npos)
     # avoid divide by zero in case the first detection matches a difficult
@@ -304,8 +314,8 @@ def main():
     #             'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
 
     annopath = r'/content/drive/MyDrive/HRSC2016/test_cut/labelTxt/{:s}.txt'
-    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result2.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_test1.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result4.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_test2.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
     imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
     #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test.txt'
 
