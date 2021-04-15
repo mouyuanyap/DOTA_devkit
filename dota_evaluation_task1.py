@@ -161,25 +161,25 @@ def voc_eval(detpath,
         lines = f.readlines()
 
     splitlines = [x.strip().split(' ') for x in lines]
-    print(splitlines)
+    #print(splitlines)
     image_ids = [x[0] for x in splitlines]
     confidence = np.array([float(x[1]) for x in splitlines])
-    print(confidence)
+    #print(confidence)
     #print('check confidence: ', confidence)
 
     BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
-    print(BB[0])
+    #print(BB[0])
     # sort by confidence
     sorted_ind = np.argsort(-confidence)
-    print(sorted_ind)
+    #print(sorted_ind)
     sorted_scores = np.sort(-confidence)
-    print(sorted_scores)
+    #print(sorted_scores)
     #print('check sorted_scores: ', sorted_scores)
     #print('check sorted_ind: ', sorted_ind)
 
     ## note the usage only in numpy not for list
     BB = BB[sorted_ind, :]
-    print(BB[0])
+    #print(BB[0])
     image_ids = [image_ids[x] for x in sorted_ind]
     #print('check imge_ids: ', image_ids)
     #print('imge_ids len:', len(image_ids))
@@ -189,7 +189,8 @@ def voc_eval(detpath,
     tp = np.zeros(nd)
     fp = np.zeros(nd)
     i = 0
-    aaa = [] 
+    aaa = []
+    hi = 0 
     for d in range(nd):
         R = class_recs[image_ids[d]]
         
@@ -197,12 +198,12 @@ def voc_eval(detpath,
         bb = BB[d, :].astype(float)
         ovmax = -np.inf
         BBGT = R['bbox'].astype(float)
-        if i<10:
+        '''if i<10:
           print(image_ids[d])
           print("BBGT")
           print(BBGT)
           print("BB")
-          print(bb)
+          print(bb)'''
         #print(bb)
         #print(BBGT)
         #print(']]]]]]]]]]]s')
@@ -237,11 +238,12 @@ def voc_eval(detpath,
                    (BBGT_ymax - BBGT_ymin + 1.) - inters)
 
             overlaps = inters / uni
-            if i<50:
-              print("overlaps: {}".format(overlaps))
+            #if i<50:
+            #  print("overlaps: {}".format(overlaps))
 
             BBGT_keep_mask = overlaps > 0
             BBGT_keep = BBGT[BBGT_keep_mask, :]
+            print('imageid:' ,image_ids[d])
             print("bbgt_keep: {}".format(BBGT_keep))
             BBGT_keep_index = np.where(overlaps > 0)[0]
             print("BBGT_keep_index: {}".format(BBGT_keep_index))
@@ -255,15 +257,15 @@ def voc_eval(detpath,
                 return overlaps
             if len(BBGT_keep) > 0:
                 overlaps = calcoverlaps(BBGT_keep, bb)
-                print('OVERLAPS: {}'.format(overlaps))
+                #print('OVERLAPS: {}'.format(overlaps))
 
                 ovmax = np.max(overlaps)
                 print('ovmax: {}'.format(ovmax))
                 jmax = np.argmax(overlaps)
-                print('jmax1: {}'.format(jmax))
+                #print('jmax1: {}'.format(jmax))
                 # pdb.set_trace()
                 jmax = BBGT_keep_index[jmax]
-                print('jmax2: {}'.format(jmax))
+                #print('jmax2: {}'.format(jmax))
 
                 print('ovthresh: {}'.format(ovthresh))
 
@@ -275,6 +277,7 @@ def voc_eval(detpath,
                 #elif R['det'][jmax] == -1:
                 #    aaa.append(d)    
                 else:
+                    hi = hi + 1
                     fp[d] = 0.
                     tp[d] = 0.
         else:
@@ -284,6 +287,7 @@ def voc_eval(detpath,
 
     #tp = np.delete(tp,aaa)
     #fp = np.delete(fp,aaa)
+    print("hi:", hi)
 
 
     print('check fp:', fp)
@@ -314,10 +318,10 @@ def main():
     #             'basketball-court', 'storage-tank',  'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter']
 
     annopath = r'/content/drive/MyDrive/HRSC2016/test_cut/labelTxt/{:s}.txt'
-    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result4.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_test2.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
-    #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test.txt'
+    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result4.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_K.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
+    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test_K.txt'
 
     # For DOTA-v1.5
     # classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
@@ -335,7 +339,7 @@ def main():
              annopath,
              imagesetfile,
              classname,
-             ovthresh=0.75,
+             ovthresh=0.65,
              use_07_metric=True)
         map = map + ap
         #print('rec: ', rec, 'prec: ', prec, 'ap: ', ap)
