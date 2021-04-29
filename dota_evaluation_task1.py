@@ -198,6 +198,7 @@ def voc_eval(detpath,
         bb = BB[d, :].astype(float)
         ovmax = -np.inf
         BBGT = R['bbox'].astype(float)
+        #print('BBGT: ',BBGT)
         '''if i<10:
           print(image_ids[d])
           print("BBGT")
@@ -319,9 +320,11 @@ def main():
 
     annopath = r'/content/drive/MyDrive/HRSC2016/test_cut/labelTxt/{:s}.txt'
     #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result4.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
-    detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_K.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    #detpath = r'/content/drive/MyDrive/RDFPN_ckpt1/{:s}_result_K.txt' # change the directory to the path of val/labelTxt, if you want to do evaluation on the valset
+    detpath = r'/content/drive/MyDrive/ship_result_test.txt'
     #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/result2/valset.txt'
-    imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test_K.txt'
+    #imagesetfile = r'/content/drive/MyDrive/RDFPN_ckpt1/valset_test_K.txt'
+    imagesetfile = r'/content/drive/MyDrive/valset_test.txt'
 
     # For DOTA-v1.5
     # classnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
@@ -339,7 +342,7 @@ def main():
              annopath,
              imagesetfile,
              classname,
-             ovthresh=0.65,
+             ovthresh=0.75,
              use_07_metric=True)
         map = map + ap
         #print('rec: ', rec, 'prec: ', prec, 'ap: ', ap)
